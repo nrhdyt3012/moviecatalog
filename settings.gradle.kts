@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "moviecatalog"
 include(":app")
- 
+include(":core")
+include(":favorite")
