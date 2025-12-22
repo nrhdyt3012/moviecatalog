@@ -13,7 +13,7 @@ android {
         minSdk = 24
         
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_KEY", "\"eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3Y2FhZmE3YTQxMGY3ZWFhNzk0MTQyNTAzMTUwMGNjNSIsIm5iZiI6MTczNDMzMjEzMi43NTQsInN1YiI6IjY3NjA1YzA0NzI2NDE0YWYxYzhmMDY5ZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bJ3Z_wQqDj9-Fj2BhfM3Tq6MdOLPuPjFkUvWXKzxSZM\"")
+        buildConfigField("String", "API_KEY", "\"eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1OTYxYTc2MTMxZjdmMjgwN2FkNjlkODUxNDVlMTI4OSIsIm5iZiI6MTcwOTAwNzMyOC44MzcsInN1YiI6IjY1ZGQ2MWUwYzkyYzVkMDE2MzQ3MTdjNiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y_ZUQ4dy7xrBIp4h0E-TU4RN-IMkKMPRmSls-BnJS3c\"")
         buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
         buildConfigField("String", "IMAGE_URL", "\"https://image.tmdb.org/t/p/w500\"")
     }

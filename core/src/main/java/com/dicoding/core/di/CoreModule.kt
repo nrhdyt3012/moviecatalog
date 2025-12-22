@@ -38,9 +38,15 @@ val databaseModule = module {
 val networkModule = module {
     single {
         val hostname = "api.themoviedb.org"
+
+        // UPDATE: Hash sertifikat baru berdasarkan error message
         val certificatePinner = CertificatePinner.Builder()
-            .add(hostname, "sha256/5VLcahb6x4EvvFrCF2TePZulWqrLHS2jCg9Ywv6JHog=")
-            .add(hostname, "sha256/vxRon/El5KuI4vx5ey1DgmsYmRY0nDd5Cg4GfJ8S+bg=")
+            // Current certificate for *.themoviedb.org
+            .add(hostname, "sha256/f78NVAesYtdZ9OGSbK7VtGQkSIVykh3DnduuLIJHMu4=")
+            // Amazon RSA 2048 M04 (Intermediate CA)
+            .add(hostname, "sha256/G9LNNAq1897egYsabashkzUCTEJkWBzgoEtk8X/678c=")
+            // Amazon Root CA 1 (Root CA)
+            .add(hostname, "sha256/++MBgDH5WGvL9Bcn5Be30cRcL0f50+NyoXuWtQdX1al=")
             .build()
 
         val authInterceptor = Interceptor { chain ->
