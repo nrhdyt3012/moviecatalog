@@ -66,6 +66,9 @@ dependencies {
     // Glide
     implementation(libs.glide)
 
+    // Play Core untuk Dynamic Feature
+    implementation(libs.feature.delivery.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

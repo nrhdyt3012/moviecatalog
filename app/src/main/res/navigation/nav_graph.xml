@@ -25,7 +25,15 @@
             app:argType="com.dicoding.moviecatalog.core.domain.model.Movie" />
     </fragment>
 
-<!--    <include app:graph="@navigation/favorite_nav_graph" />-->
-<!--    &lt;!&ndash; Include navigation graph dari dynamic feature module &ndash;&gt;-->
+    <!-- Fragment dari dynamic feature module favorite -->
+    <fragment
+        android:id="@+id/favoriteFragment"
+        android:name="com.dicoding.moviecatalog.favorite.FavoriteFragment"
+        android:label="@string/favorite_movies"
+        tools:layout="@layout/fragment_favorite">
+        <action
+            android:id="@+id/action_favorite_to_detail"
+            app:destination="@id/detailMovieFragment" />
+    </fragment>
 
 </navigation>

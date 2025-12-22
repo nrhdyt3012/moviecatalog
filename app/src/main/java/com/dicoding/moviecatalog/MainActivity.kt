@@ -2,6 +2,7 @@ package com.dicoding.moviecatalog
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -10,11 +11,17 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.dicoding.moviecatalog.databinding.ActivityMainBinding
-import com.google.android.material.navigation.NavigationBarView
+import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
+import com.google.android.play.core.splitinstall.SplitInstallRequest
+import com.google.android.play.core.splitinstall.SplitInstallStateUpdatedListener
+import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val splitInstallManager by lazy {
+        SplitInstallManagerFactory.create(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,14 +63,21 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.favoriteFragment -> {
-                    try {
-                        // Coba navigate ke favoriteFragment
-                        if (navController.currentDestination?.id != R.id.favoriteFragment) {
-                            navController.navigate(R.id.favoriteFragment)
+                    // Cek apakah module favorite sudah terinstall
+                    if (splitInstallManager.installedModules.contains("favorite")) {
+                        try {
+                            if (navController.currentDestination?.id != R.id.favoriteFragment) {
+                                navController.navigate(R.id.favoriteFragment)
+                            }
+                            true
+                        } catch (e: Exception) {
+                            Log.e("MainActivity", "Error navigating to favorite: ${e.message}")
+                            Toast.makeText(this, "Error opening favorites", Toast.LENGTH_SHORT).show()
+                            false
                         }
-                        true
-                    } catch (e: Exception) {
-                        Log.e("MainActivity", "Error navigating to favorite: ${e.message}")
+                    } else {
+                        // Install module favorite jika belum terinstall
+                        installFavoriteModule()
                         false
                     }
                 }
@@ -78,6 +92,38 @@ class MainActivity : AppCompatActivity() {
                 R.id.favoriteFragment -> binding.bottomNavigation.selectedItemId = R.id.favoriteFragment
             }
         }
+    }
+
+    private fun installFavoriteModule() {
+        val request = SplitInstallRequest.newBuilder()
+            .addModule("favorite")
+            .build()
+
+        val listener = SplitInstallStateUpdatedListener { state ->
+            when (state.status()) {
+                SplitInstallSessionStatus.INSTALLED -> {
+                    Toast.makeText(this, "Favorite module installed", Toast.LENGTH_SHORT).show()
+                    // Navigate to favorite after installation
+                    val navHostFragment = supportFragmentManager
+                        .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                    val navController = navHostFragment.navController
+                    navController.navigate(R.id.favoriteFragment)
+                }
+                SplitInstallSessionStatus.INSTALLING -> {
+                    Toast.makeText(this, "Installing favorite module...", Toast.LENGTH_SHORT).show()
+                }
+                SplitInstallSessionStatus.FAILED -> {
+                    Toast.makeText(this, "Failed to install favorite module", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        splitInstallManager.registerListener(listener)
+        splitInstallManager.startInstall(request)
+            .addOnFailureListener { exception ->
+                Log.e("MainActivity", "Error installing module: ${exception.message}")
+                Toast.makeText(this, "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     override fun onSupportNavigateUp(): Boolean {
