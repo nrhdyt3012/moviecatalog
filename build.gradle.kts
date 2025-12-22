@@ -4,4 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.android.dynamic.feature) apply false
+    id("androidx.navigation.safeargs.kotlin") version "2.8.5" apply false
+
 }

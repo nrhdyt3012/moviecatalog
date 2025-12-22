@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.dynamic.feature)
     id("kotlin-parcelize")
+    id("androidx.navigation.safeargs.kotlin")
+
 }
 
 android {

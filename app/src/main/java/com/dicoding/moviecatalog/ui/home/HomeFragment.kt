@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.dicoding.moviecatalog.R
 import com.dicoding.moviecatalog.core.data.Resource
+import com.dicoding.moviecatalog.core.domain.model.Movie
 import com.dicoding.moviecatalog.databinding.FragmentHomeBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -82,7 +83,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun handleResource(resource: Resource<List<com.dicoding.moviecatalog.core.domain.model.Movie>>?) {
+    private fun handleResource(resource: Resource<List<Movie>>?) {
         when (resource) {
             is Resource.Loading -> showLoading(true)
             is Resource.Success -> {
