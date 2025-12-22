@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.dicoding.moviecatalog.R
 import com.dicoding.moviecatalog.core.data.Resource
 import com.dicoding.moviecatalog.core.domain.model.Movie
+import com.dicoding.moviecatalog.core.utils.NetworkUtils
 import com.dicoding.moviecatalog.databinding.FragmentHomeBinding
+import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : Fragment() {
@@ -78,6 +80,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun searchMovies(query: String) {
+        // Cek koneksi internet sebelum search
+        if (!NetworkUtils.isNetworkAvailable(requireContext())) {
+            showError(true, "Tidak ada koneksi internet. Menampilkan data tersimpan.")
+            // Tetap coba search untuk menampilkan data cache jika ada
+        }
+
         homeViewModel.searchMovies(query).observe(viewLifecycleOwner) { movies ->
             handleResource(movies)
         }
@@ -99,7 +107,35 @@ class HomeFragment : Fragment() {
             }
             is Resource.Error -> {
                 showLoading(false)
-                showError(true, resource.message ?: getString(R.string.error_message))
+
+                // Jika ada data meskipun error (dari cache), tampilkan data tersebut
+                resource.data?.let { data ->
+                    if (data.isNotEmpty()) {
+                        movieAdapter.setData(data)
+                        // Tampilkan snackbar untuk error tapi tetap menampilkan data cache
+                        Snackbar.make(
+                            binding.root,
+                            resource.message ?: "Terjadi kesalahan. Menampilkan data tersimpan.",
+                            Snackbar.LENGTH_LONG
+                        ).setAction("Coba Lagi") {
+                            val query = binding.searchEditText.text.toString()
+                            if (query.isNotEmpty()) {
+                                searchMovies(query)
+                            } else {
+                                observeMovies()
+                            }
+                        }.show()
+                        return
+                    }
+                }
+
+                // Jika tidak ada data sama sekali, tampilkan error message
+                val errorMessage = when {
+                    !NetworkUtils.isNetworkAvailable(requireContext()) ->
+                        "Tidak ada koneksi internet dan tidak ada data tersimpan."
+                    else -> resource.message ?: getString(R.string.error_message)
+                }
+                showError(true, errorMessage)
             }
             else -> {}
         }
@@ -114,6 +150,11 @@ class HomeFragment : Fragment() {
 
     private fun showEmpty(isEmpty: Boolean) {
         binding.tvEmpty.isVisible = isEmpty
+        binding.tvEmpty.text = if (NetworkUtils.isNetworkAvailable(requireContext())) {
+            "Tidak ada film yang ditemukan"
+        } else {
+            "Tidak ada koneksi internet dan tidak ada data tersimpan"
+        }
         binding.rvMovies.isVisible = !isEmpty
         binding.progressBar.isVisible = false
         binding.tvError.isVisible = false
@@ -125,6 +166,11 @@ class HomeFragment : Fragment() {
         binding.rvMovies.isVisible = !isError
         binding.progressBar.isVisible = false
         binding.tvEmpty.isVisible = false
+
+        // Tambahkan ikon atau visual indicator untuk offline
+        if (message.contains("koneksi internet", ignoreCase = true)) {
+            // Bisa tambahkan icon wifi off jika perlu
+        }
     }
 
     override fun onDestroyView() {

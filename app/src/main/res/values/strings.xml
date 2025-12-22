@@ -58,4 +58,12 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+
+    <!-- Error Messages -->
+    <string name="error_no_internet">Tidak ada koneksi internet</string>
+    <string name="error_no_internet_cached">Tidak ada koneksi internet. Menampilkan data tersimpan.</string>
+    <string name="error_timeout">Koneksi timeout. Silakan coba lagi.</string>
+    <string name="error_server">Server sedang bermasalah. Silakan coba lagi nanti.</string>
+    <string name="error_not_found">Data tidak ditemukan</string>
+    <string name="retry">Coba Lagi</string>
 </resources>
