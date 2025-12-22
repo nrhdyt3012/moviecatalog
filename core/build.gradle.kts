@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
     id("com.google.devtools.ksp") version "2.0.21-1.0.28"
@@ -10,12 +10,8 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.dicoding.moviecatalog.core"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
-
+        
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "API_KEY", "\"eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3Y2FhZmE3YTQxMGY3ZWFhNzk0MTQyNTAzMTUwMGNjNSIsIm5iZiI6MTczNDMzMjEzMi43NTQsInN1YiI6IjY3NjA1YzA0NzI2NDE0YWYxYzhmMDY5ZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bJ3Z_wQqDj9-Fj2BhfM3Tq6MdOLPuPjFkUvWXKzxSZM\"")
         buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")

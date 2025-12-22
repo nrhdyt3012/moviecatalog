@@ -29,5 +29,5 @@ data class MovieEntity(
     val releaseDate: String,
 
     @ColumnInfo(name = "isFavorite")
-    val isFavorite: Boolean = false
+    var isFavorite: Boolean = false  // UBAH dari val ke var
 )

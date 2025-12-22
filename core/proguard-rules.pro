@@ -48,6 +48,8 @@
     <fields>;
 }
 
+-keep class com.dicoding.moviecatalog.core.domain.** { *; }
+
 ##---------------Begin: proguard configuration for Domain Models  ----------
 -keep class com.dicoding.moviecatalog.core.domain.model.** { *; }
 -keep class com.dicoding.moviecatalog.core.data.source.remote.response.** { *; }
