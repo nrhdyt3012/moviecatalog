@@ -25,7 +25,7 @@
             app:argType="com.dicoding.moviecatalog.core.domain.model.Movie" />
     </fragment>
 
-    <!-- Include navigation graph dari favorite module -->
-    <include app:graph="@navigation/favorite_nav_graph" />
+<!--    <include app:graph="@navigation/favorite_nav_graph" />-->
+<!--    &lt;!&ndash; Include navigation graph dari dynamic feature module &ndash;&gt;-->
 
 </navigation>
