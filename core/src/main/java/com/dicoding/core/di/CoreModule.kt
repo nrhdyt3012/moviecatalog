@@ -39,15 +39,20 @@ val networkModule = module {
     single {
         val hostname = "api.themoviedb.org"
 
-        // UPDATE: Hash sertifikat baru berdasarkan error message
-        val certificatePinner = CertificatePinner.Builder()
-            // Current certificate for *.themoviedb.org
-            .add(hostname, "sha256/f78NVAesYtdZ9OGSbK7VtGQkSIVykh3DnduuLIJHMu4=")
-            // Amazon RSA 2048 M04 (Intermediate CA)
-            .add(hostname, "sha256/G9LNNAq1897egYsabashkzUCTEJkWBzgoEtk8X/678c=")
-            // Amazon Root CA 1 (Root CA)
-            .add(hostname, "sha256/++MBgDH5WGvL9Bcn5Be30cRcL0f50+NyoXuWtQdX1al=")
-            .build()
+        // Certificate Pinning - dinonaktifkan untuk debugging, aktifkan untuk production
+        val certificatePinner = if (BuildConfig.DEBUG) {
+            // Tidak menggunakan certificate pinning di debug mode
+            CertificatePinner.Builder().build()
+        } else {
+            CertificatePinner.Builder()
+                // Current certificate untuk *.themoviedb.org
+                .add(hostname, "sha256/f78NVAesYtdZ9OGSbK7VtGQkSIVykh3DnduuLIJHMu4=")
+                // Amazon RSA 2048 M04 (Intermediate CA)
+                .add(hostname, "sha256/G9LNNAq1897egYsabashkzUCTEJkWBzgoEtk8X/678c=")
+                // Amazon Root CA 1 (Root CA)
+                .add(hostname, "sha256/++MBgDH5WGvL9Bcn5Be30cRcL0f50+NyoXuWtQdX1al=")
+                .build()
+        }
 
         val authInterceptor = Interceptor { chain ->
             val req = chain.request()
@@ -57,9 +62,17 @@ val networkModule = module {
             chain.proceed(requestHeaders)
         }
 
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
+        }
+
         OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(loggingInterceptor)
             .connectTimeout(120, TimeUnit.SECONDS)
             .readTimeout(120, TimeUnit.SECONDS)
             .certificatePinner(certificatePinner)

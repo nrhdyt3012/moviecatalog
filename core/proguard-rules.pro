@@ -48,6 +48,7 @@
     <fields>;
 }
 
+##---------------Begin: Keep Domain Models - CRITICAL  ----------
 -keep class com.dicoding.moviecatalog.core.domain.** { *; }
 
 ##---------------Begin: proguard configuration for Domain Models  ----------
