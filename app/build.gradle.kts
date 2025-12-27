@@ -31,6 +31,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            packaging {
+                resources {
+                    pickFirst("META-INF/**")
+                }
+            }
 
             // Signing config - PENTING untuk release
             signingConfig = signingConfigs.getByName("debug")
