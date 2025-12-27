@@ -6,7 +6,6 @@ import com.dicoding.moviecatalog.core.di.networkModule
 import com.dicoding.moviecatalog.core.di.repositoryModule
 import com.dicoding.moviecatalog.di.useCaseModule
 import com.dicoding.moviecatalog.di.viewModelModule
-import leakcanary.LeakCanary
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -17,7 +16,7 @@ class MyApplication : Application() {
         super.onCreate()
 
         // Setup Leak Canary (otomatis hanya jalan di debug build)
-        setupLeakCanary()
+        // LeakCanary tidak perlu konfigurasi manual, otomatis aktif di debug
 
         startKoin {
             androidLogger(Level.NONE)
@@ -30,18 +29,6 @@ class MyApplication : Application() {
                     useCaseModule,
                     viewModelModule
                 )
-            )
-        }
-    }
-
-    private fun setupLeakCanary() {
-        if (BuildConfig.DEBUG) {
-            // LeakCanary configuration
-            LeakCanary.config = LeakCanary.config.copy(
-                // Detect leaks yang terjadi di semua activities
-                dumpHeap = true,
-                // Retain objects untuk analisis
-                retainedVisibleThreshold = 3
             )
         }
     }
