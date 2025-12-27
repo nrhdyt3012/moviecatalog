@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
+    id("jacoco")
 }
 
 android {
@@ -37,6 +38,8 @@ android {
         debug {
             isMinifyEnabled = false
             isDebuggable = true
+            enableUnitTestCoverage = true
+            enableAndroidTestCoverage = true
         }
     }
 
@@ -76,6 +79,57 @@ android {
         }
     }
 }
+tasks.withType<Test> {
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
+    }
+}
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*",
+        "**/*\$ViewInjector*.*",
+        "**/*\$ViewBinder*.*",
+        "**/databinding/*",
+        "**/android/databinding/*",
+        "**/androidx/databinding/*",
+        "**/di/module/*",
+        "**/*MapperImpl*.*",
+        "**/*\$Lambda$*.*",
+        "**/*Companion*.*",
+        "**/*Module*.*",
+        "**/*Dagger*.*",
+        "**/*Factory*.*",
+        "**/*_Provide*.*"
+    )
+
+    val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(project.buildDir) {
+        include("jacoco/testDebugUnitTest.exec")
+    })
+}
+
 
 dependencies {
     implementation(project(":core"))
@@ -104,7 +158,15 @@ dependencies {
     // Play Core untuk Dynamic Feature
     implementation(libs.feature.delivery.ktx)
 
+    // Leak Canary - hanya untuk debug
+    debugImplementation(libs.leakcanary.android)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.arch.core.testing)
+    testImplementation(libs.turbine)
 }
