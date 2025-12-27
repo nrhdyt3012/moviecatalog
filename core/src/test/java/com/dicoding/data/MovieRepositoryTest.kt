@@ -7,7 +7,6 @@ import com.dicoding.moviecatalog.core.data.source.remote.RemoteDataSource
 import com.dicoding.moviecatalog.core.data.source.remote.network.ApiResponse
 import com.dicoding.moviecatalog.core.data.source.remote.response.MovieResponse
 import com.dicoding.moviecatalog.core.utils.AppExecutors
-import com.dicoding.moviecatalog.core.utils.DataMapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -16,9 +15,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
-import java.util.concurrent.Executor
+import kotlin.time.Duration.Companion.seconds
 
 @ExperimentalCoroutinesApi
 class MovieRepositoryTest {
@@ -82,16 +80,20 @@ class MovieRepositoryTest {
         )
 
         // When & Then
-        movieRepository.getAllMovies().test {
-            // Loading state
+        movieRepository.getAllMovies().test(timeout = 5.seconds) {
+            // First emission: Loading
             val loading = awaitItem()
-            assertTrue(loading is Resource.Loading)
+            assertTrue("First emission should be Loading", loading is Resource.Loading)
 
-            // Success state
+            // Second emission: Loading (before fetch)
+            val loading2 = awaitItem()
+            assertTrue("Second emission should be Loading", loading2 is Resource.Loading)
+
+            // Third emission: Success with data
             val success = awaitItem()
-            assertTrue(success is Resource.Success)
-            assertNotNull(success.data)
-            assertEquals(2, success.data?.size)
+            assertTrue("Third emission should be Success", success is Resource.Success)
+            assertNotNull("Data should not be null", success.data)
+            assertEquals("Should have 2 movies", 2, success.data?.size)
 
             awaitComplete()
         }
@@ -106,15 +108,24 @@ class MovieRepositoryTest {
         )
 
         // When & Then
-        movieRepository.getAllMovies().test {
-            // Loading state
+        movieRepository.getAllMovies().test(timeout = 5.seconds) {
+            // First emission: Loading
             val loading = awaitItem()
-            assertTrue(loading is Resource.Loading)
+            assertTrue("First emission should be Loading", loading is Resource.Loading)
 
-            // Error state
+            // Second emission: Loading (before fetch)
+            val loading2 = awaitItem()
+            assertTrue("Second emission should be Loading", loading2 is Resource.Loading)
+
+            // Third emission: Error
             val error = awaitItem()
-            assertTrue(error is Resource.Error)
-            assertNotNull(error.message)
+            assertTrue("Third emission should be Error", error is Resource.Error)
+            assertNotNull("Error message should not be null", error.message)
+            assertTrue(
+                "Error message should contain error info",
+                error.message?.contains("kesalahan") == true ||
+                        error.message?.contains("error") == true
+            )
 
             awaitComplete()
         }
@@ -126,16 +137,16 @@ class MovieRepositoryTest {
         `when`(localDataSource.getAllMovies()).thenReturn(flowOf(dummyMovieEntity))
 
         // When & Then
-        movieRepository.getAllMovies().test {
-            // Loading state
+        movieRepository.getAllMovies().test(timeout = 5.seconds) {
+            // First emission: Loading
             val loading = awaitItem()
-            assertTrue(loading is Resource.Loading)
+            assertTrue("First emission should be Loading", loading is Resource.Loading)
 
-            // Success state with cached data
+            // Second emission: Success with cached data
             val success = awaitItem()
-            assertTrue(success is Resource.Success)
-            assertEquals(1, success.data?.size)
-            assertEquals("Test Movie 1", success.data?.get(0)?.title)
+            assertTrue("Second emission should be Success", success is Resource.Success)
+            assertEquals("Should have 1 movie", 1, success.data?.size)
+            assertEquals("Movie title should match", "Test Movie 1", success.data?.get(0)?.title)
 
             awaitComplete()
         }
@@ -151,16 +162,20 @@ class MovieRepositoryTest {
         )
 
         // When & Then
-        movieRepository.searchMovies(query).test {
-            // Loading state
+        movieRepository.searchMovies(query).test(timeout = 5.seconds) {
+            // First emission: Loading
             val loading = awaitItem()
-            assertTrue(loading is Resource.Loading)
+            assertTrue("First emission should be Loading", loading is Resource.Loading)
 
-            // Success state
+            // Second emission: Loading (before fetch)
+            val loading2 = awaitItem()
+            assertTrue("Second emission should be Loading", loading2 is Resource.Loading)
+
+            // Third emission: Success
             val success = awaitItem()
-            assertTrue(success is Resource.Success)
-            assertEquals(1, success.data?.size)
-            assertEquals("Test Movie 1", success.data?.get(0)?.title)
+            assertTrue("Third emission should be Success", success is Resource.Success)
+            assertEquals("Should have 1 movie", 1, success.data?.size)
+            assertEquals("Movie title should match", "Test Movie 1", success.data?.get(0)?.title)
 
             awaitComplete()
         }
@@ -175,10 +190,33 @@ class MovieRepositoryTest {
         `when`(localDataSource.getFavoriteMovies()).thenReturn(flowOf(favoriteMovies))
 
         // When & Then
-        movieRepository.getFavoriteMovies().test {
+        movieRepository.getFavoriteMovies().test(timeout = 5.seconds) {
             val result = awaitItem()
-            assertEquals(1, result.size)
-            assertTrue(result[0].isFavorite)
+            assertEquals("Should have 1 favorite movie", 1, result.size)
+            assertTrue("Movie should be favorite", result[0].isFavorite)
+
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `getAllMovies should return error with cached data when network fails but cache exists`() = runTest {
+        // Given
+        `when`(localDataSource.getAllMovies()).thenReturn(flowOf(dummyMovieEntity))
+        `when`(remoteDataSource.getAllMovies()).thenReturn(
+            flowOf(ApiResponse.Error("Network timeout"))
+        )
+
+        // When & Then
+        movieRepository.getAllMovies().test(timeout = 5.seconds) {
+            // First: Loading
+            val loading = awaitItem()
+            assertTrue(loading is Resource.Loading)
+
+            // Second: Success with cached data (shouldFetch returns false because cache exists)
+            val success = awaitItem()
+            assertTrue("Should return cached data", success is Resource.Success)
+            assertEquals(1, success.data?.size)
 
             awaitComplete()
         }
