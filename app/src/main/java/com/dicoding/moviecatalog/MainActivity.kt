@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                     val navHostFragment = supportFragmentManager
                         .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
                     val navController = navHostFragment.navController
-                    navController.navigate(R.id.favoriteFragment)
+                    navController.navigate(R.id.favorite_nav_graph)
                 }
                 SplitInstallSessionStatus.INSTALLING -> {
                     Toast.makeText(this, "Installing favorite module...", Toast.LENGTH_SHORT).show()
