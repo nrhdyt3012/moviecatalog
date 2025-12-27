@@ -58,22 +58,16 @@ class FavoriteFragment : Fragment() {
 
     private fun navigateToDetail(movie: Movie) {
         try {
-            // Gunakan action dari favorite_nav_graph
-            val action = FavoriteFragmentDirections.actionFavoriteToDetail(movie)
-            findNavController().navigate(action)
-        } catch (e: Exception) {
-            // Fallback: navigate menggunakan ID langsung
-            try {
-                val bundle = Bundle().apply {
-                    putParcelable("movie", movie)
-                }
-                findNavController().navigate(
-                    com.dicoding.moviecatalog.R.id.detailMovieFragment,
-                    bundle
-                )
-            } catch (ex: Exception) {
-                ex.printStackTrace()
+            // Navigate menggunakan Bundle manual (tidak pakai SafeArgs)
+            val bundle = Bundle().apply {
+                putParcelable("movie", movie)
             }
+            findNavController().navigate(
+                com.dicoding.moviecatalog.R.id.detailMovieFragment,
+                bundle
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
