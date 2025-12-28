@@ -19,6 +19,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/searchEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionSearch"
@@ -28,6 +29,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvMovies"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
@@ -42,6 +44,7 @@
         tools:listitem="@layout/item_movie" />
 
     <ProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
@@ -52,6 +55,7 @@
         tools:visibility="visible" />
 
     <TextView
+        android:id="@+id/tvEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/no_data"
@@ -64,6 +68,7 @@
         tools:visibility="visible" />
 
     <TextView
+        android:id="@+id/tvError"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"

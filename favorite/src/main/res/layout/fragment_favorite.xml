@@ -7,6 +7,7 @@
     tools:context=".FavoriteFragment">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFavoriteMovies"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -20,6 +21,7 @@
         tools:listitem="@layout/item_movie" />
 
     <TextView
+        android:id="@+id/tvEmptyFavorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/no_favorite"
