@@ -2,6 +2,7 @@ package com.dicoding.moviecatalog.favorite
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.dicoding.moviecatalog.R
 import com.dicoding.moviecatalog.core.domain.model.Movie
 import com.dicoding.moviecatalog.favorite.databinding.FragmentFavoriteBinding
 import com.dicoding.moviecatalog.ui.home.MovieAdapter
@@ -25,7 +27,11 @@ class FavoriteFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        loadKoinModules(favoriteModule)
+        try {
+            loadKoinModules(favoriteModule)
+        } catch (e: Exception) {
+            Log.e("FavoriteFragment", "Error loading Koin modules: ${e.message}")
+        }
     }
 
     override fun onCreateView(
@@ -58,16 +64,14 @@ class FavoriteFragment : Fragment() {
 
     private fun navigateToDetail(movie: Movie) {
         try {
-            // Navigate menggunakan Bundle manual (tidak pakai SafeArgs)
+            // Gunakan navigation dari app module dengan action yang tepat
+            val action = R.id.action_favorite_to_detail
             val bundle = Bundle().apply {
                 putParcelable("movie", movie)
             }
-            findNavController().navigate(
-                com.dicoding.moviecatalog.R.id.detailMovieFragment,
-                bundle
-            )
+            findNavController().navigate(action, bundle)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e("FavoriteFragment", "Navigation error: ${e.message}", e)
         }
     }
 

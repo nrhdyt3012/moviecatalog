@@ -2,8 +2,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.dynamic.feature)
     id("kotlin-parcelize")
-//    id("androidx.navigation.safeargs.kotlin")
-
 }
 
 android {
@@ -17,22 +15,47 @@ android {
 
     buildTypes {
         release {
-//            isMinifyEnabled = false
-//            proguardFiles(
-//                getDefaultProguardFile("proguard-android-optimize.txt"),
-//                "proguard-rules.pro"
-//            )
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
+            isMinifyEnabled = false
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         viewBinding = true
+    }
+
+    // PENTING: Pastikan tidak ada duplicate resources
+    packaging {
+        resources {
+            excludes += listOf(
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/notice.txt",
+                "META-INF/ASL2.0",
+                "META-INF/*.kotlin_module"
+            )
+            // Hindari duplicate navigation
+            pickFirst("navigation/*.xml")
+        }
     }
 }
 

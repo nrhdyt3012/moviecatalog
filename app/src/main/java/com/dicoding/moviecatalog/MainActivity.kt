@@ -58,7 +58,11 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.homeFragment -> {
                     if (navController.currentDestination?.id != R.id.homeFragment) {
-                        navController.navigate(R.id.homeFragment)
+                        try {
+                            navController.navigate(R.id.homeFragment)
+                        } catch (e: Exception) {
+                            Log.e("MainActivity", "Error navigating to home: ${e.message}")
+                        }
                     }
                     true
                 }
@@ -67,11 +71,12 @@ class MainActivity : AppCompatActivity() {
                     if (splitInstallManager.installedModules.contains("favorite")) {
                         try {
                             if (navController.currentDestination?.id != R.id.favoriteFragment) {
+                                // Navigate langsung ke favoriteFragment yang ada di nav_graph.xml
                                 navController.navigate(R.id.favoriteFragment)
                             }
                             true
                         } catch (e: Exception) {
-                            Log.e("MainActivity", "Error navigating to favorite: ${e.message}")
+                            Log.e("MainActivity", "Error navigating to favorite: ${e.message}", e)
                             Toast.makeText(this, "Error opening favorites", Toast.LENGTH_SHORT).show()
                             false
                         }
@@ -107,7 +112,11 @@ class MainActivity : AppCompatActivity() {
                     val navHostFragment = supportFragmentManager
                         .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
                     val navController = navHostFragment.navController
-                    navController.navigate(R.id.favorite_nav_graph)
+                    try {
+                        navController.navigate(R.id.favoriteFragment)
+                    } catch (e: Exception) {
+                        Log.e("MainActivity", "Error after install: ${e.message}", e)
+                    }
                 }
                 SplitInstallSessionStatus.INSTALLING -> {
                     Toast.makeText(this, "Installing favorite module...", Toast.LENGTH_SHORT).show()
